@@ -39,6 +39,55 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); over
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
+.locked .app { display: none; }
+.locked { overflow: hidden; }
+.gate {
+  position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+  background: rgba(12,12,15,.78);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  padding: 24px;
+}
+.locked .gate { display: flex; }
+.gate-card {
+  width: min(520px, 100%);
+  background: linear-gradient(180deg, rgba(22,22,26,.92), rgba(22,22,26,.82));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 30px 90px rgba(0,0,0,.55);
+}
+.gate-title { font-size: 16px; font-weight: 700; letter-spacing: -.2px; margin-bottom: 8px; }
+.gate-sub { font-size: 13px; color: var(--text2); line-height: 1.5; margin-bottom: 14px; }
+.gate-mono { font-family: var(--mono); color: var(--text); }
+.gate-row { display: flex; gap: 10px; }
+.gate-input {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  outline: none;
+}
+.gate-input:focus { border-color: var(--t1); box-shadow: 0 0 0 3px var(--t1glow); }
+.gate-btn {
+  background: var(--t1bg);
+  border: 1px solid rgba(167,139,250,.35);
+  color: var(--t1);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  user-select: none;
+}
+.gate-btn:hover { transform: translateY(-1px); border-color: rgba(167,139,250,.6); }
+.gate-error { margin-top: 10px; font-size: 12px; color: #fca5a5; min-height: 16px; }
+
 .app { display: grid; grid-template-columns: 320px 1fr; grid-template-rows: auto 1fr; height: 100vh; }
 
 header {
@@ -178,7 +227,18 @@ header {
 }
 </style>
 </head>
-<body>
+<body class="locked">
+<div class="gate" id="gate" aria-hidden="false">
+  <div class="gate-card" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+    <div class="gate-title" id="gateTitle">Enter password</div>
+    <div class="gate-sub">Password format: <span class="gate-mono">rohan</span> + <span class="gate-mono">ddmm</span> (today).</div>
+    <div class="gate-row">
+      <input class="gate-input" id="gatePassword" type="password" placeholder="Password" autocomplete="current-password" />
+      <button class="gate-btn" id="gateSubmit" type="button">Unlock</button>
+    </div>
+    <div class="gate-error" id="gateError" aria-live="polite"></div>
+  </div>
+</div>
 <div class="app">
   <header>
     <div class="logo">
@@ -198,6 +258,43 @@ header {
 </div>
 
 <script>
+function expectedPasswordForToday() {
+  const d = new Date();
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  return `rohan${dd}${mm}`;
+}
+
+function unlockIfCorrectPassword() {
+  const input = document.getElementById('gatePassword');
+  const error = document.getElementById('gateError');
+  const entered = (input?.value ?? '').trim();
+
+  if (entered !== expectedPasswordForToday()) {
+    error.textContent = 'Incorrect password.';
+    input?.select();
+    return false;
+  }
+
+  document.body.classList.remove('locked');
+  document.getElementById('gate')?.setAttribute('aria-hidden', 'true');
+  error.textContent = '';
+  input.value = '';
+  return true;
+}
+
+function initGate() {
+  const btn = document.getElementById('gateSubmit');
+  const input = document.getElementById('gatePassword');
+
+  btn?.addEventListener('click', unlockIfCorrectPassword);
+  input?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') unlockIfCorrectPassword();
+  });
+
+  setTimeout(() => input?.focus(), 0);
+}
+
 const TIERS = {
   1: { color: '#a78bfa', bg: 'rgba(167,139,250,.12)', label: 'Tier 1 · Critical' },
   2: { color: '#34d399', bg: 'rgba(52,211,153,.10)', label: 'Tier 2' },
@@ -485,6 +582,7 @@ function showWelcome() {
 
 buildSidebar();
 showWelcome();
+initGate();
 </script>
 </body>
 </html>
