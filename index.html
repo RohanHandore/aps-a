@@ -3,586 +3,436 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Payments — Service Architecture Map</title>
+<title>GP ECom Gateway — Architecture Diagram</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0c0c0f;
-  --surface: #16161a;
-  --surface2: #1e1e24;
-  --surface3: #26262e;
-  --border: #2a2a34;
-  --border-hover: #3a3a48;
-  --text: #e8e6e3;
-  --text2: #9a9a9a;
-  --text3: #666;
-  --t1: #a78bfa;
-  --t1bg: rgba(167,139,250,.12);
-  --t1glow: rgba(167,139,250,.25);
-  --t2: #34d399;
-  --t2bg: rgba(52,211,153,.10);
-  --t2glow: rgba(52,211,153,.2);
-  --t3: #6b7280;
-  --t3bg: rgba(107,114,128,.10);
-  --t3glow: rgba(107,114,128,.15);
-  --r1: #f87171; --r2: #fbbf24; --r3: #6b7280;
-  --accent: #60a5fa;
-  --accent-bg: rgba(96,165,250,.1);
-  --font: 'DM Sans', system-ui, sans-serif;
-  --mono: 'JetBrains Mono', monospace;
-  --radius: 10px;
+:root{
+  --bg:#08080c;--sf:#111116;--s2:#191920;--s3:#21212a;
+  --bd:#242430;--bh:#34344a;
+  --tx:#e6e4df;--t2:#9a9a9a;--t3:#55556a;
+  --purple:#a78bfa;--purpleBg:rgba(167,139,250,.10);--purpleGl:rgba(167,139,250,.30);
+  --green:#34d399;--greenBg:rgba(52,211,153,.09);--greenGl:rgba(52,211,153,.22);
+  --gray:#6b7280;--grayBg:rgba(107,114,128,.09);
+  --blue:#60a5fa;--blueBg:rgba(96,165,250,.09);
+  --amber:#fbbf24;--amberBg:rgba(251,191,36,.09);
+  --red:#f87171;--cyan:#22d3ee;
+  --f:'DM Sans',system-ui,sans-serif;--m:'JetBrains Mono',monospace;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: var(--font); overflow-x: hidden; }
-::selection { background: rgba(167,139,250,.3); }
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:var(--f);overflow:hidden;height:100vh}
+::selection{background:rgba(167,139,250,.25)}
 
-.locked .app { display: none; }
-.locked { overflow: hidden; }
-.gate {
-  position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
-  background: rgba(12,12,15,.78);
-  backdrop-filter: blur(10px);
-  z-index: 9999;
-  padding: 24px;
-}
-.locked .gate { display: flex; }
-.gate-card {
-  width: min(520px, 100%);
-  background: linear-gradient(180deg, rgba(22,22,26,.92), rgba(22,22,26,.82));
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 30px 90px rgba(0,0,0,.55);
-}
-.gate-title { font-size: 16px; font-weight: 700; letter-spacing: -.2px; margin-bottom: 8px; }
-.gate-sub { font-size: 13px; color: var(--text2); line-height: 1.5; margin-bottom: 14px; }
-.gate-mono { font-family: var(--mono); color: var(--text); }
-.gate-row { display: flex; gap: 10px; }
-.gate-input {
-  flex: 1;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 12px;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 13px;
-  outline: none;
-}
-.gate-input:focus { border-color: var(--t1); box-shadow: 0 0 0 3px var(--t1glow); }
-.gate-btn {
-  background: var(--t1bg);
-  border: 1px solid rgba(167,139,250,.35);
-  color: var(--t1);
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .15s;
-  user-select: none;
-}
-.gate-btn:hover { transform: translateY(-1px); border-color: rgba(167,139,250,.6); }
-.gate-error { margin-top: 10px; font-size: 12px; color: #fca5a5; min-height: 16px; }
+/* ── HEADER ── */
+.hdr{position:fixed;top:0;left:0;right:0;height:46px;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 16px;z-index:100;gap:12px}
+.hdr .logo{display:flex;align-items:center;gap:8px}
+.hdr .ic{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,var(--purple),var(--blue));font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.hdr h1{font-size:13px;font-weight:600;white-space:nowrap}
+.hdr h1 span{color:var(--t2);font-weight:400}
+.hdr .sep{flex:1}
+.lgd{display:flex;gap:10px;font-size:10px;color:var(--t2);align-items:center;flex-wrap:wrap}
+.lgd b{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:2px;vertical-align:middle}
+.ctrls{display:flex;gap:4px}
+.cb{width:28px;height:28px;border-radius:6px;background:var(--s2);border:1px solid var(--bd);color:var(--t2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--f);transition:all .12s}
+.cb:hover{border-color:var(--bh);color:var(--tx)}
+.cb.txt{width:auto;padding:0 10px;font-size:10px;font-weight:500}
 
-.app { display: grid; grid-template-columns: 320px 1fr; grid-template-rows: auto 1fr; height: 100vh; }
+/* ── CANVAS ── */
+.wrap{position:fixed;top:46px;left:0;right:0;bottom:40px;overflow:hidden;cursor:grab}
+.wrap:active{cursor:grabbing}
+.cvs{position:absolute;transform-origin:0 0}
 
-header {
-  grid-column: 1/-1; padding: 16px 28px; display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--border); background: var(--surface); z-index: 10;
-}
-.logo { display: flex; align-items: center; gap: 12px; }
-.logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--t1), var(--accent)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff; }
-.logo h1 { font-size: 16px; font-weight: 600; letter-spacing: -.3px; }
-.logo h1 span { color: var(--text2); font-weight: 400; }
-.header-controls { display: flex; gap: 8px; align-items: center; }
-.search-box {
-  background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; font-size: 13px;
-  color: var(--text); font-family: var(--font); width: 240px; outline: none; transition: border-color .2s;
-}
-.search-box:focus { border-color: var(--t1); }
-.search-box::placeholder { color: var(--text3); }
-.filter-btn {
-  background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 12px;
-  color: var(--text2); cursor: pointer; font-family: var(--font); transition: all .15s; user-select: none;
-}
-.filter-btn:hover { border-color: var(--border-hover); color: var(--text); }
-.filter-btn.active { border-color: var(--t1); color: var(--t1); background: var(--t1bg); }
+/* ── ZONES ── */
+.zone{position:absolute;border:1.5px dashed;border-radius:14px;z-index:0;pointer-events:none;opacity:.5}
+.zlbl{position:absolute;font-size:8px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;z-index:0;background:var(--bg);padding:0 5px}
 
-.sidebar {
-  border-right: 1px solid var(--border); background: var(--surface); overflow-y: auto; padding: 0;
-}
-.sidebar-section { border-bottom: 1px solid var(--border); }
-.sidebar-section-header {
-  padding: 12px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px;
-  color: var(--text3); cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-  user-select: none; transition: color .15s; position: sticky; top: 0; background: var(--surface); z-index: 2;
-}
-.sidebar-section-header:hover { color: var(--text2); }
-.sidebar-section-header .chevron { transition: transform .2s; font-size: 10px; }
-.sidebar-section-header .chevron.collapsed { transform: rotate(-90deg); }
-.sidebar-section-header .count { background: var(--surface2); padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 500; margin-left: 6px; }
-.sidebar-list { padding: 0 8px 8px; }
-.sidebar-item {
-  padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center;
-  gap: 8px; transition: all .12s; position: relative; line-height: 1.3;
-}
-.sidebar-item:hover { background: var(--surface2); }
-.sidebar-item.active { background: var(--t1bg); }
-.sidebar-item .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.sidebar-item .name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sidebar-item .tier-badge {
-  font-size: 9px; font-weight: 600; font-family: var(--mono); padding: 1px 5px; border-radius: 4px;
-  flex-shrink: 0; letter-spacing: .3px;
-}
-.sidebar-item .conn-count { font-size: 10px; color: var(--text3); font-family: var(--mono); }
-.hidden { display: none !important; }
+/* ── NODES ── */
+.nd{position:absolute;border-radius:7px;cursor:pointer;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:5px 8px;font-size:10.5px;font-weight:500;line-height:1.25;user-select:none;border:1px solid rgba(255,255,255,.05);transition:transform .1s,box-shadow .15s,border-color .15s,opacity .2s}
+.nd:hover{transform:scale(1.07);z-index:30}
+.nd.hl{z-index:20}
+.nd small{font-size:8px;font-weight:400;opacity:.55;margin-top:1px}
 
-.main { overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+/* Tier colors */
+.nd.t1{background:var(--purpleBg);color:var(--purple)}
+.nd.t1.hl{border-color:var(--purple);box-shadow:0 0 16px var(--purpleGl)}
+.nd.t2{background:var(--greenBg);color:var(--green)}
+.nd.t2.hl{border-color:var(--green);box-shadow:0 0 14px var(--greenGl)}
+.nd.t3{background:var(--grayBg);color:var(--gray)}
+.nd.t3.hl{border-color:var(--gray);box-shadow:0 0 12px rgba(107,114,128,.2)}
 
-.detail-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
-  animation: fadeUp .25s ease;
-}
-@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.detail-header {
-  padding: 20px 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
-  border-bottom: 1px solid var(--border);
-}
-.detail-title { font-size: 20px; font-weight: 600; letter-spacing: -.3px; }
-.detail-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-.badge-pill {
-  font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px;
-}
-.detail-desc { padding: 16px 24px; font-size: 14px; color: var(--text2); line-height: 1.6; border-bottom: 1px solid var(--border); }
+/* Special types */
+.nd.ext{background:rgba(255,255,255,.025);color:var(--t2);border-color:rgba(255,255,255,.04);font-size:9.5px;border-radius:4px;padding:3px 7px}
+.nd.ext.hl{border-color:var(--blue);box-shadow:0 0 10px rgba(96,165,250,.18);color:var(--blue)}
+.nd.db{border-radius:3px 3px 14px 14px;border-color:rgba(251,191,36,.15);background:rgba(251,191,36,.06);color:var(--amber)}
+.nd.db.hl{border-color:var(--amber);box-shadow:0 0 14px rgba(251,191,36,.22)}
+.nd.big{font-size:13px;font-weight:600;letter-spacing:-.2px}
+.nd .ico{font-size:11px;margin-bottom:1px;opacity:.5}
 
-.connections-grid { padding: 16px 24px 20px; display: flex; flex-direction: column; gap: 16px; }
-.conn-group-title {
-  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text3);
-  display: flex; align-items: center; gap: 8px;
-}
-.conn-group-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-.conn-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.conn-chip {
-  font-size: 12px; padding: 6px 12px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border);
-  background: var(--surface2); color: var(--text); transition: all .15s; display: flex; align-items: center; gap: 6px;
-}
-.conn-chip:hover { border-color: var(--t1); background: var(--t1bg); transform: translateY(-1px); }
-.conn-chip .chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+/* ── SVG EDGES ── */
+svg.el{position:absolute;top:0;left:0;pointer-events:none;z-index:1;overflow:visible}
 
-.flow-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 24px;
-}
-.flow-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.flow-steps { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
-.flow-step {
-  font-size: 12px; padding: 5px 10px; border-radius: 6px; cursor: pointer; transition: all .15s;
-}
-.flow-step:hover { transform: translateY(-1px); }
-.flow-arrow { color: var(--text3); font-size: 14px; }
+/* ── TOOLTIP ── */
+.tt{position:fixed;z-index:300;background:var(--sf);border:1px solid var(--bh);border-radius:10px;padding:14px 16px;max-width:340px;pointer-events:none;opacity:0;transition:opacity .1s;font-size:12px;line-height:1.55;box-shadow:0 12px 40px rgba(0,0,0,.55)}
+.tt.show{opacity:1}
+.tt .tn{font-size:14px;font-weight:600;margin-bottom:4px;letter-spacing:-.2px}
+.tt .tb{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+.tt .tp{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:500}
+.tt .td{color:var(--t2)}
+.tt .tc{margin-top:10px;padding-top:8px;border-top:1px solid var(--bd);font-size:10px;color:var(--t3);line-height:1.6}
+.tt .tc strong{color:var(--t2);font-weight:500}
 
-.welcome-state {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1;
-  text-align: center; color: var(--text3); gap: 12px; padding: 60px 20px;
-}
-.welcome-state .big-icon { font-size: 48px; opacity: .15; margin-bottom: 8px; }
-.welcome-state h2 { font-size: 18px; font-weight: 500; color: var(--text2); }
-.welcome-state p { font-size: 13px; max-width: 380px; line-height: 1.6; }
-
-.stats-bar {
-  display: flex; gap: 6px; flex-wrap: wrap; padding: 0 24px 16px;
-}
-.stat {
-  background: var(--surface2); border-radius: 8px; padding: 10px 14px; font-size: 20px; font-weight: 700;
-  font-family: var(--mono); display: flex; flex-direction: column; gap: 2px; min-width: 80px;
-}
-.stat small { font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; font-family: var(--font); }
-
-.network-canvas-wrap {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; position: relative;
-}
-.network-canvas-wrap h3 {
-  padding: 14px 20px; font-size: 13px; font-weight: 600; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 8px;
-}
-#networkCanvas { width: 100%; display: block; cursor: grab; }
-#networkCanvas:active { cursor: grabbing; }
-.canvas-controls {
-  position: absolute; bottom: 12px; right: 12px; display: flex; gap: 4px;
-}
-.canvas-ctrl-btn {
-  width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface);
-  color: var(--text2); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
-  transition: all .15s;
-}
-.canvas-ctrl-btn:hover { border-color: var(--border-hover); color: var(--text); }
-
-@media (max-width: 800px) {
-  .app { grid-template-columns: 1fr; }
-  .sidebar { max-height: 40vh; }
-  .search-box { width: 140px; }
-}
+/* ── INFO BAR ── */
+.ib{position:fixed;bottom:0;left:0;right:0;height:40px;background:var(--sf);border-top:1px solid var(--bd);display:flex;align-items:center;padding:0 16px;gap:10px;z-index:100;font-size:11px;color:var(--t2)}
+.ib .nm{font-weight:600;color:var(--tx);font-size:11px}
+.ib .ds{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ib .pl{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:500}
+.ib .ht{color:var(--t3);font-style:italic;font-size:10px}
 </style>
 </head>
-<body class="locked">
-<div class="gate" id="gate" aria-hidden="false">
-  <div class="gate-card" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
-    <div class="gate-title" id="gateTitle">Enter password</div>
-    <div class="gate-sub">Enter password to continue.</div>
-    <div class="gate-row">
-      <input class="gate-input" id="gatePassword" type="password" placeholder="Password" autocomplete="current-password" />
-      <button class="gate-btn" id="gateSubmit" type="button">Unlock</button>
-    </div>
-    <div class="gate-error" id="gateError" aria-live="polite"></div>
+<body>
+
+<div class="hdr">
+  <div class="logo"><div class="ic">GP</div><h1>GP ECom gateway<span> — service architecture</span></h1></div>
+  <div class="sep"></div>
+  <div class="lgd">
+    <span><b style="background:var(--purple)"></b>Tier 1</span>
+    <span><b style="background:var(--green)"></b>Tier 2</span>
+    <span><b style="background:var(--gray)"></b>Tier 3</span>
+    <span><b style="background:rgba(251,191,36,.4)"></b>Database</span>
+    <span><b style="background:rgba(255,255,255,.06);border:1px solid var(--bd)"></b>External</span>
+  </div>
+  <div class="ctrls">
+    <button class="cb" onclick="zm(1.2)" title="Zoom in">+</button>
+    <button class="cb" onclick="zm(1/1.2)" title="Zoom out">−</button>
+    <button class="cb" onclick="fit()" title="Fit to screen">⌂</button>
+    <button class="cb txt" onclick="clr()">Reset</button>
   </div>
 </div>
-<div class="app">
-  <header>
-    <div class="logo">
-      <div class="logo-icon">GP</div>
-      <h1>Service architecture <span>— Global Payments</span></h1>
-    </div>
-    <div class="header-controls">
-      <input class="search-box" id="search" type="text" placeholder="Search services…" autocomplete="off">
-      <button class="filter-btn" data-tier="1" onclick="toggleFilter(1)">Tier 1</button>
-      <button class="filter-btn" data-tier="2" onclick="toggleFilter(2)">Tier 2</button>
-      <button class="filter-btn" data-tier="3" onclick="toggleFilter(3)">Tier 3</button>
-    </div>
-  </header>
 
-  <div class="sidebar" id="sidebar"></div>
-  <div class="main" id="main"></div>
-</div>
+<div class="wrap" id="W"><div class="cvs" id="C"></div></div>
+<div class="tt" id="TT"></div>
+<div class="ib" id="IB"><span class="ht">Hover a service for details · Click to lock highlight · Esc to reset · Scroll to zoom · Drag to pan</span></div>
 
 <script>
-function expectedPasswordForToday() {
-  const d = new Date();
-  const dd = String(d.getDate()).padStart(2, '0');
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  return `rohan${dd}${mm}`;
-}
+/* ══════════════════════════════════════════════════════════
+   NODE DATA — positions match the provided diagram exactly
+   ══════════════════════════════════════════════════════════ */
+const N=[
+// ─── MERCHANTS (far left) ───
+{id:"Merchant System",x:20,y:295,w:95,h:40,t:1,d:"External merchant system integrating via REST API. Sends transaction requests directly to the Transaction Router for real-time processing."},
+{id:"Merchant System (HPP)",x:20,y:430,w:95,h:38,t:1,lbl:"Merchant\nSystem",d:"Merchant system using the Hosted Payment Page integration. Redirects customers to HPP for card capture, reducing the merchant's PCI DSS scope."},
+{id:"Merchant",x:20,y:520,w:72,h:32,t:1,d:"Merchant operator using the RealControl Virtual Terminal to manually key card-not-present transactions via a web browser."},
 
-function unlockIfCorrectPassword() {
-  const input = document.getElementById('gatePassword');
-  const error = document.getElementById('gateError');
-  const entered = (input?.value ?? '').trim();
+// ─── ENTRY SERVICES ───
+{id:"HPP",x:158,y:435,w:58,h:36,t:1,d:"Hosted Payment Page — a white-labelled, PCI-compliant checkout page hosted by Global Payments. Captures card data on behalf of the merchant and forwards it into the processing path via Transaction Router."},
+{id:"RC2.1",x:148,y:520,w:56,h:32,t:1,d:"RealControl 2.1 — web-based Virtual Terminal interface. Allows operators to key in card-not-present transactions which are passed to rxp-api for processing."},
+{id:"rxp-api",x:240,y:520,w:68,h:32,t:1,d:"Realex Payments XML/JSON API — legacy but high-volume merchant-facing API. Receives transactions from RC2.1 and other integrations, and feeds them into the Transaction Router."},
 
-  if (entered !== expectedPasswordForToday()) {
-    error.textContent = 'Incorrect password.';
-    input?.select();
-    return false;
-  }
+// ─── TRANSACTION ROUTER ───
+{id:"Transaction Router",x:230,y:293,w:120,h:44,t:1,big:1,d:"Core routing engine at the heart of the gateway. Inspects card BIN, currency, merchant configuration, and 3DS requirements to decide the correct processing path. Routes to IPS for real-time processing, and dispatches to APM, DCC, 3DS Server, and CSS as needed."},
 
-  document.body.classList.remove('locked');
-  document.getElementById('gate')?.setAttribute('aria-hidden', 'true');
-  error.textContent = '';
-  input.value = '';
-  return true;
-}
+// ─── ABOVE TR: VALUE-ADDED ───
+{id:"APM",x:310,y:58,w:60,h:34,t:1,d:"Alternative Payment Methods service — integrates non-card payment rails including iDEAL (Netherlands), Sofort (Germany), Giropay (Germany), Bancontact (Belgium) and others. Routes to PPRo aggregator."},
+{id:"DCC",x:300,y:125,w:62,h:34,t:2,d:"Dynamic Currency Conversion service — offers international cardholders the option to pay in their home currency at point of sale. Queries real-time FX rates and routes to Planet and Fexco gateways for rate provision and conversion."},
+{id:"3DS Server",x:272,y:195,w:82,h:34,t:1,d:"3D Secure authentication server — implements the EMVCo 3DS2 protocol for Strong Customer Authentication (SCA) under PSD2. Communicates challenge/frictionless flows before the transaction proceeds through IPS."},
+{id:"CSS",x:300,y:255,w:56,h:32,t:1,d:"Configuration & Settings Service — the central configuration store for the entire platform. Holds merchant profiles, terminal IDs, routing rules, feature flags, and processing parameters. Queried by Transaction Router on every transaction."},
 
-function initGate() {
-  const btn = document.getElementById('gateSubmit');
-  const input = document.getElementById('gatePassword');
+// ─── IPS (large central block) ───
+{id:"IPS",x:410,y:240,w:150,h:115,t:1,big:1,d:"Inline Processing Service — the central real-time orchestration engine. Receives routed transactions, performs inline fraud/risk scoring, coordinates with Crypto for card data encryption/decryption, dispatches to Bank Service for acquirer gateway routing, and writes transaction records to the payandshop database. Also triggers Settlement and Fraud Engine paths."},
 
-  btn?.addEventListener('click', unlockIfCorrectPassword);
-  input?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') unlockIfCorrectPassword();
-  });
+// ─── RIGHT OF IPS: unnamed processing block + Crypto ───
+{id:"Bank DBs",x:590,y:108,w:72,h:48,t:1,db:1,lbl:"bank\ndbs",d:"Bank configuration databases — stores acquiring bank credentials, BIN routing tables, terminal configurations, and HSM key references. Referenced by Crypto for key lookups and by the processing layer for acquirer selection."},
+{id:"Crypto",x:590,y:195,w:70,h:38,t:1,d:"Cryptographic services engine — handles all HSM-backed encryption, decryption, PIN translation, and key management for PAN, CVV, and PIN data. Sits between IPS and the gateway layer to ensure card data is encrypted in transit and at rest. References Bank DBs for key material."},
 
-  setTimeout(() => input?.focus(), 0);
-}
+// ─── BANK SERVICE (gateway dispatcher) ───
+{id:"Bank Service",x:600,y:370,w:85,h:44,t:1,d:"Gateway dispatcher — the acquirer routing layer. After IPS processes the transaction, Bank Service selects the correct downstream gateway based on the merchant's acquiring bank relationship, card brand, BIN, currency, and region. Connects to all gateway services."},
 
-const TIERS = {
-  1: { color: '#a78bfa', bg: 'rgba(167,139,250,.12)', label: 'Tier 1 · Critical' },
-  2: { color: '#34d399', bg: 'rgba(52,211,153,.10)', label: 'Tier 2' },
-  3: { color: '#6b7280', bg: 'rgba(107,114,128,.10)', label: 'Tier 3' },
-};
-const RISK = { R1: '#f87171', R2: '#fbbf24', R3: '#6b7280' };
+// ─── GATEWAYS (right column) ───
+{id:"ISO GW",x:740,y:160,w:80,h:36,t:1,d:"ISO 8583 Gateway — general-purpose connector speaking the ISO 8583 financial messaging standard. Routes to multiple UK and European acquirers: Elavon, Santander, AIB, Worldpay, Barclays, Lloyds, GP UK/HSBC, and UK/HSBC failover."},
+{id:"APACS XOT GW",x:740,y:218,w:100,h:36,t:1,lbl:"APACS\nXOT GW",d:"APACS gateway supporting both TCP/IP and X.25-over-TCP (XOT) transport. Connects to UK banks using the legacy APACS messaging standard. Routes to AIB, Worldpay, Barclays, Lloyds, GP UK/HSBC."},
+{id:"Redsys",x:740,y:300,w:70,h:34,t:1,lbl:"Redsys",d:"Redsys gateway — connects to Spain's national Redsys card processing network for all Spanish domestic and international card acquiring."},
+{id:"GPC",x:740,y:348,w:60,h:34,t:1,d:"GSAP/GPC Gateway — Global Payments Cloud gateway routing to the Global and South Asia Pacific regional processor. Primary path to GPNA (Global Payments North America)."},
+{id:"UATP",x:740,y:400,w:60,h:34,t:1,d:"Universal Air Travel Plan gateway — specialised connector for airline payment processing. Handles UATP card transactions and routes through to Cybersource for settlement."},
+{id:"AIB APACS",x:740,y:450,w:80,h:34,t:2,d:"Dedicated APACS connection specifically to Allied Irish Banks. Separate from the general APACS/XOT gateway to handle AIB-specific message format requirements and routing."},
 
-const LAYERS = [
-  { name: "Merchant entry points", id: "entry", svcs: [
-    { n:"Payments API",t:1,r:"R1",c:1,desc:"Primary API for merchants to submit payment transactions programmatically",out:["Transaction Router","IPS","Crypto","CSS","APM","3DS2","Escrow Marketplace","Installment-service"],in:[]},
-    { n:"API",t:1,r:"R1",c:1,desc:"General-purpose REST API layer for merchant-facing platform operations",out:["CSS","Transaction Router","TSS","Bank Service"],in:[]},
-    { n:"HPP",t:1,r:"R1",c:1,desc:"Hosted Payment Page — merchant checkout that reduces PCI scope",out:["Payments API","3DS2","Crypto","CSS","Tokenisation Service","CDN"],in:[]},
-    { n:"RealControl VT",t:1,r:"R1",c:1,desc:"Virtual Terminal — web interface for manually keying card-not-present transactions",out:["Payments API","Crypto"],in:[]},
-    { n:"Realex API",t:1,r:"R1",c:1,desc:"Legacy Realex Payments API interface still handling significant transaction volume",out:["Transaction Router","IPS","Crypto"],in:[]},
-    { n:"Open Banking",t:1,r:"R1",c:1,desc:"Enables bank-to-bank payments via PSD2 Open Banking APIs, bypassing card networks",out:["OpenBanking File Management","Messenger Service"],in:[]},
-  ]},
-  { name: "Risk, fraud & authentication", id: "risk", svcs: [
-    { n:"IPS",t:1,r:"R1",c:1,desc:"Inline fraud/risk scoring service on the real-time transaction path",out:["Transaction Router","Fraud Engine","Card ID Service"],in:["Payments API","Realex API"]},
-    { n:"3DS2",t:1,r:"R1",c:2,desc:"Implements 3D Secure 2.0 cardholder authentication (PSD2/SCA compliance)",out:["3DS Enrollment","OTP","Transaction Router","Hosted Redirect Router"],in:["Payments API","HPP"]},
-    { n:"3DS Enrollment",t:2,r:"R2",c:2,desc:"Checks whether a card is enrolled in a 3DS program before authentication",out:["Card ID Service"],in:["3DS2"]},
-    { n:"Fraud Engine",t:2,r:"R2",c:1,desc:"Runs fraud detection rules and risk scoring against transactions",out:["PRM-service","Card ID Service"],in:["IPS"]},
-    { n:"PRM-service",t:2,r:"R2",c:2,desc:"Proactive Risk Manager — portfolio-level monitoring and merchant risk scoring",out:["TSS"],in:["Fraud Engine"]},
-    { n:"OTP",t:2,r:"R2",c:2,desc:"Generates and validates OTPs for authentication and transaction verification",out:["Messenger Service"],in:["3DS2"]},
-  ]},
-  { name: "Routing, config & card intelligence", id: "routing", svcs: [
-    { n:"Transaction Router",t:1,r:"R1",c:1,desc:"Routes each transaction to the correct downstream gateway based on card, currency, and merchant config",out:["CSS","Card ID Service","Bank Service","MCS","DCC Rate API","Authorization Service","Gateways"],in:["Payments API","API","IPS","3DS2","Realex API"]},
-    { n:"CSS",t:1,r:"R1",c:2,desc:"Configuration & Settings Service — manages merchant configs, terminal settings, and feature flags",out:[],in:["Transaction Router","Payments API","HPP","API","Bank Service"]},
-    { n:"Card ID Service",t:1,r:"R1",c:1,desc:"Identifies card type, issuing bank, and attributes from the BIN for routing and fee decisions",out:[],in:["Transaction Router","IPS","3DS Enrollment","Fraud Engine","DCC Service"]},
-    { n:"Crypto",t:1,r:"R1",c:1,desc:"Handles all encryption, decryption, and key management for sensitive card data",out:["Vormetric TDE"],in:["Payments API","HPP","Realex API","RealControl VT","Tokenisation Service"]},
-    { n:"MCS",t:1,r:"R1",c:2,desc:"Multi-Currency Service — handles currency conversion for settlement and cross-border transactions",out:["DCC Rate API"],in:["Transaction Router","Bulkfiles Core"]},
-    { n:"DCC Rate API",t:1,r:"R1",c:1,desc:"Provides real-time exchange rates for DCC transactions",out:[],in:["Transaction Router","MCS","DCC Service"]},
-    { n:"DCC Service",t:2,r:"R2",c:1,desc:"Dynamic Currency Conversion — lets cardholders pay in their home currency at point of sale",out:["DCC Rate API","Card ID Service","Powerzac-dcc-gateway"],in:[]},
-    { n:"Bank Service",t:1,r:"R1",c:2,desc:"Manages merchant-bank relationships and acquiring arrangements for settlement routing",out:["CSS"],in:["Transaction Router","API","Bulkfiles Core"]},
-    { n:"Tokenisation Service",t:3,r:"R3",c:3,desc:"Replaces card numbers with tokens for secure storage and recurring payments",out:["Crypto"],in:["HPP","Account Updater/CUS","Card Migration Tool"]},
-  ]},
-  { name: "Gateways & connectors", id: "gw", svcs: [
-    { n:"GPNA GW",t:1,r:"R1",c:1,desc:"Global Payments North America — core processing for the NA market",out:["Stunnel"],in:["Transaction Router"]},
-    { n:"Redsys GW",t:1,r:"R1",c:1,desc:"Connects to Spain's Redsys national card processing network",out:["Stunnel"],in:["Transaction Router"]},
-    { n:"Apacs TCP/IP Gateway",t:1,r:"R1",c:1,desc:"Connects to UK banks via APACS messaging standard over TCP/IP",out:[],in:["Transaction Router"]},
-    { n:"XOT APACS GW",t:1,r:"R1",c:1,desc:"APACS protocol over X.25-over-TCP transport for legacy UK bank connections",out:[],in:["Transaction Router"]},
-    { n:"New APACS GW",t:1,r:"R1",c:1,desc:"Modernized APACS gateway replacing legacy implementations",out:[],in:["Transaction Router"]},
-    { n:"AIB APACS Gateway",t:2,r:"R2",c:1,desc:"APACS connection specifically to Allied Irish Banks",out:[],in:["Transaction Router"]},
-    { n:"CB2A Gateway",t:1,r:"R1",c:1,desc:"Connects to France's Cartes Bancaires (CB2A) banking network",out:[],in:["Transaction Router"]},
-    { n:"Omnipay Gateway",t:1,r:"R1",c:1,desc:"Integration adapter for the Omnipay processor",out:[],in:["Transaction Router"]},
-    { n:"Gateway - UATP",t:1,r:"R1",c:1,desc:"Universal Air Travel Plan gateway for airline payment processing",out:[],in:["Transaction Router"]},
-    { n:"ISO Gateway",t:1,r:"R1",c:1,desc:"General-purpose connector for processors speaking ISO 8583 standard",out:[],in:["Transaction Router"]},
-    { n:"Cybersource Gateway",t:2,r:"R2",c:1,desc:"Connects to Visa's Cybersource platform for specific merchant flows",out:[],in:["Transaction Router"]},
-    { n:"GSAP Gateway (GPC)",t:1,r:"R1",c:2,desc:"Global and South Asia Pacific regional processor gateway",out:[],in:["Transaction Router"]},
-    { n:"amexcapn-gateway",t:1,r:"R1",c:1,desc:"Direct connection to American Express CAPN authorization network",out:[],in:["Transaction Router"]},
-    { n:"Planet ISO Gateway",t:2,r:"R2",c:1,desc:"Connects to Planet Payment's ISO interface for multi-currency hospitality/travel",out:[],in:["Transaction Router"]},
-    { n:"Gatecnx GW",t:1,r:"R1",c:1,desc:"Bank/processor-specific gateway connection",out:[],in:["Transaction Router"]},
-    { n:"MIGs GW",t:1,r:"R1",c:1,desc:"MasterCard Internet Gateway Service connector",out:[],in:["Transaction Router"]},
-    { n:"Comercia 2.0 Gateway",t:3,r:"R3",c:3,desc:"Low-volume or legacy processor connection",out:[],in:["Transaction Router"]},
-    { n:"Aer Lingus Connector",t:1,r:"R1",c:1,desc:"Dedicated connector for Aer Lingus airline's custom payment integration",out:[],in:["Transaction Router"]},
-    { n:"Powerzac-gateway",t:1,r:"R1",c:1,desc:"Processor gateway for Powerzac transactions",out:[],in:["Transaction Router"]},
-    { n:"Powerzac-dcc-gateway",t:2,r:"R2",c:2,desc:"DCC-specific gateway for Powerzac",out:[],in:["DCC Service"]},
-    { n:"Propay-gateway",t:2,r:"R2",c:2,desc:"ProPay processor connection — planned Tier 1",out:[],in:["Transaction Router"]},
-    { n:"Hosted Redirect Router",t:2,r:"R2",c:1,desc:"Manages redirect flows to/from external payment pages and 3DS providers",out:[],in:["3DS2"]},
-    { n:"Stunnel",t:1,r:"R1",c:1,desc:"Creates TLS/SSL tunnels for secure communication to external endpoints",out:[],in:["GPNA GW","Redsys GW"]},
-    { n:"Fexco gateway mock",t:3,r:"R3",c:3,desc:"Mock/test version of the Fexco gateway for development and QA",out:[],in:[]},
-    { n:"SSO - Desjardins",t:3,r:"R3",c:3,desc:"Single Sign-On integration for Desjardins",out:[],in:[]},
-  ]},
-  { name: "Authorization & transaction lifecycle", id: "auth", svcs: [
-    { n:"Authorization Service",t:2,r:"R2",c:2,desc:"Manages auth request/response cycle with card networks and banks",out:["Messenger Service"],in:["Transaction Router"]},
-    { n:"APM",t:1,r:"R1",c:1,desc:"Alternative Payment Methods — integrates iDEAL, Sofort, Giropay and other non-card methods",out:["Messenger Service"],in:["Payments API","Transaction Router"]},
-    { n:"Escrow Marketplace",t:2,r:"R2",c:1,desc:"Manages escrow payment flows for marketplace platforms with held funds",out:["Billing Service"],in:["Payments API"]},
-    { n:"Installment-service",t:2,r:"R2",c:2,desc:"Manages installment payment plans and buy-now-pay-later type flows",out:["Installment-Notification"],in:["Payments API"]},
-    { n:"WDS",t:2,r:"R2",c:1,desc:"Web-based service supporting transaction processing workflows",out:[],in:["Transaction Router"]},
-  ]},
-  { name: "Settlement & batch processing", id: "settle", svcs: [
-    { n:"Bulkfiles Core",t:1,r:"R1",c:1,desc:"Groups approved transactions into settlement batches for bank file generation",out:["Batch ID Service","Bank Service","MCS","Batching & File Processing"],in:[]},
-    { n:"Bulkfiles API",t:1,r:"R1",c:1,desc:"API layer for bulk file processing and settlement batch operations",out:["Bulkfiles Core"],in:[]},
-    { n:"Batch ID Service",t:1,r:"R1",c:1,desc:"Generates and manages unique batch identifiers for settlement processing",out:[],in:["Bulkfiles Core"]},
-    { n:"Batching & File Processing",t:2,r:"R2",c:2,desc:"Manages batch infrastructure and SFTP file transfers to/from banks",out:["Aib File Mgmt","Transaction File Mgmt"],in:["Bulkfiles Core"]},
-    { n:"Rebatching Interface",t:3,r:"R3",c:3,desc:"Allows ops teams to fix and regenerate failed or rejected settlement batches",out:["Bulkfiles Core"],in:[]},
-    { n:"PPRo SFTP Service",t:2,r:"R2",c:2,desc:"SFTP file exchange service for PPRo alternative payment method aggregator",out:[],in:["Batching & File Processing"]},
-    { n:"Aib File Mgmt",t:2,r:"R2",c:2,desc:"File management for Allied Irish Banks-specific file exchanges",out:[],in:["Batching & File Processing"]},
-    { n:"Transaction File Mgmt",t:2,r:"R2",c:2,desc:"General-purpose service for managing transaction files across bank integrations",out:[],in:["Batching & File Processing"]},
-    { n:"Account Updater/CUS",t:3,r:"R3",c:3,desc:"Batch-updates expired/replaced card details for recurring payment merchants",out:["Tokenisation Service"],in:[]},
-    { n:"Card Migration Tool",t:3,r:"R3",c:3,desc:"Migrates card tokens and merchant data between platforms or processors",out:["Tokenisation Service"],in:[]},
-  ]},
-  { name: "Notifications & reporting", id: "notify", svcs: [
-    { n:"Messenger Service",t:2,r:"R2",c:2,desc:"Sends webhooks, emails, and SMS notifications to merchants about transaction events",out:[],in:["Authorization Service","OTP","Open Banking","APM"]},
-    { n:"Billing Service",t:2,r:"R2",c:2,desc:"Calculates and charges merchants their processing fees and platform usage costs",out:["Merchant Reporting"],in:["TSS","Escrow Marketplace"]},
-    { n:"TSS",t:2,r:"R2",c:2,desc:"Provides transaction lookup across the platform for portals and internal support",out:["RealControl Reporting"],in:["API","PRM-service","Billing Service","MRDI"]},
-    { n:"RealControl Reporting",t:2,r:"R2",c:2,desc:"Merchant-facing portal for viewing transaction history and settlement details",out:[],in:["TSS"]},
-    { n:"Merchant Reporting",t:2,r:"R2",c:2,desc:"Generates merchant-facing reports, statements, and summaries",out:[],in:["MRDI","Billing Service"]},
-    { n:"MRDI",t:2,r:"R2",c:2,desc:"Imports and transforms raw transaction data into report-ready format",out:["Merchant Reporting","TSS"],in:[]},
-    { n:"Datalake-Notification",t:2,r:"R2",c:2,desc:"Publishes transaction events to the data lake for analytics pipelines",out:[],in:["Transaction Router"]},
-    { n:"Propay-notifications",t:2,r:"R2",c:2,desc:"Notification service for ProPay integration events",out:[],in:["Propay-gateway"]},
-    { n:"Installment-Notification",t:2,r:"R2",c:2,desc:"Sends notifications related to installment payment events",out:[],in:["Installment-service"]},
-    { n:"OpenBanking File Management",t:2,r:"R2",c:2,desc:"Handles file-based reconciliation and reporting for Open Banking transactions",out:[],in:["Open Banking"]},
-  ]},
-  { name: "Admin tools & portals", id: "admin", svcs: [
-    { n:"HPP On-Prem",t:2,r:"R2",c:2,desc:"On-premise HPP variant for data residency requirements",out:[],in:[]},
-    { n:"White-emanager",t:2,r:"R2",c:2,desc:"White-labelled merchant management portal for partners and resellers",out:["CSS"],in:[]},
-    { n:"CMS",t:3,r:"R3",c:3,desc:"Content Management System for HPP templates, emails, and portal content",out:["HPP"],in:[]},
-    { n:"Template uploader",t:3,r:"R3",c:3,desc:"Allows merchants/teams to upload custom branding templates for payment pages",out:["HPP"],in:[]},
-    { n:"Gadmin",t:3,r:"R3",c:3,desc:"Internal admin console for merchant setup, routing rules, and configuration",out:["CSS","Transaction Router"],in:[]},
-    { n:"Briscoe Management Tool",t:3,r:"R3",c:3,desc:"Internal tool for a specific operational management function",out:[],in:[]},
-    { n:"TMT",t:3,r:"R3",c:3,desc:"Monitors transaction patterns for AML compliance and suspicious activity",out:["TSS"],in:[]},
-  ]},
-  { name: "Infrastructure", id: "infra", svcs: [
-    { n:"CDN",t:2,r:"R2",c:2,desc:"Content Delivery Network — serves HPP assets from global edge servers",out:[],in:["HPP"]},
-    { n:"Vormetric TDE",t:2,r:"R2",c:2,desc:"Transparent Data Encryption — encrypts data at rest on disk",out:[],in:["Crypto"]},
-    { n:"GlusterFS",t:2,r:"R2",c:2,desc:"Distributed file storage for shared file access across application nodes",out:[],in:[]},
-    { n:"Memcached",t:3,r:"R3",c:3,desc:"In-memory caching for frequently accessed data like merchant configs and BIN tables",out:[],in:["CSS","Card ID Service"]},
-    { n:"Elasticsearch Watchers",t:3,r:"R3",c:3,desc:"Automated alerting based on Elasticsearch queries for log/metric anomalies",out:[],in:[]},
-    { n:"Kibana",t:3,r:"R3",c:3,desc:"Elasticsearch-based dashboarding for internal operational monitoring",out:[],in:[]},
-  ]},
-  { name: "DevOps & legacy", id: "devops", svcs: [
-    { n:"Sandbox Services",t:3,r:"R3",c:3,desc:"Test/sandbox environment for merchant integration testing",out:[],in:[]},
-    { n:"Test Archetype",t:3,r:"R3",c:3,desc:"Testing framework template for standardized test suite scaffolding",out:[],in:[]},
-    { n:"test-archetype-api",t:3,r:"R3",c:3,desc:"API companion to the test archetype for automated testing",out:[],in:[]},
-    { n:"MAAS",t:3,r:"R3",c:3,desc:"Metal/Monitoring as a Service — infrastructure provisioning or monitoring",out:[],in:[]},
-    { n:"Artifactory",t:3,r:"R3",c:3,desc:"Artifact repository for storing build artifacts, Docker images, and dependencies",out:[],in:[]},
-    { n:"Nexus",t:3,r:"R3",c:3,desc:"Secondary artifact repository for build artifacts and dependency management",out:[],in:[]},
-    { n:"Automic UC4",t:3,r:"R3",c:3,desc:"Enterprise scheduler for batch jobs, reports, and maintenance tasks",out:["Bulkfiles Core","Batching & File Processing"],in:[]},
-    { n:"Scheduler",t:3,r:"R3",c:3,desc:"Lightweight application-level scheduling for recurring tasks",out:[],in:[]},
-    { n:"AAU",t:3,r:"R3",c:3,desc:"Internal authentication/authorization utility",out:[],in:[]},
-    { n:"Blue-e",t:3,r:"R3",c:3,desc:"Legacy internal system or platform version",out:[],in:[]},
-    { n:"CML",t:3,r:"R3",c:3,desc:"Configuration Management Library or internal tooling",out:[],in:[]},
-  ]},
+// ─── DCC/APM GATEWAYS (top-right) ───
+{id:"Planet GW",x:710,y:72,w:72,h:30,t:2,lbl:"Planet",d:"Planet Payment ISO gateway — connects to Planet Payment for multi-currency Dynamic Currency Conversion in hospitality, travel, and retail verticals."},
+{id:"Fexco GW",x:710,y:110,w:68,h:30,t:2,lbl:"Fexco",d:"Fexco gateway — connects to Fexco's foreign exchange platform for DCC rate provision and real-time currency conversion services."},
+
+// ─── EXTERNAL ENDPOINTS (far right) ───
+{id:"PPRo",x:920,y:56,w:52,h:26,t:2,ext:1,d:"PPRo — alternative payment method aggregator. Connects the APM rail to local payment providers across Europe (iDEAL, Sofort, Giropay, Bancontact, eps, etc.)."},
+{id:"Planet (ext)",x:840,y:72,w:52,h:24,t:2,ext:1,lbl:"Planet",d:"Planet Payment — external multi-currency payment technology provider for hospitality and travel."},
+{id:"Fexco (ext)",x:840,y:110,w:50,h:24,t:2,ext:1,lbl:"Fexco",d:"Fexco — external foreign exchange and DCC service provider headquartered in Ireland."},
+
+{id:"Elavon",x:900,y:135,w:52,h:22,t:1,ext:1,d:"Elavon — major US and European payment processor and acquiring bank, subsidiary of US Bancorp."},
+{id:"Santander",x:900,y:160,w:65,h:22,t:1,ext:1,d:"Santander — global bank providing card acquiring services across Europe and Latin America."},
+{id:"AIB (ISO)",x:960,y:183,w:40,h:22,t:1,ext:1,lbl:"AIB",d:"Allied Irish Banks — reached via ISO 8583 gateway for domestic Irish acquiring."},
+{id:"Worldpay",x:900,y:205,w:62,h:22,t:1,ext:1,d:"Worldpay (FIS) — one of the world's largest payment processors handling billions of transactions annually."},
+{id:"Barclays",x:900,y:230,w:58,h:22,t:1,ext:1,d:"Barclays — major UK acquiring bank providing card acceptance services."},
+{id:"Lloyds",x:900,y:255,w:48,h:22,t:1,ext:1,d:"Lloyds Banking Group — UK acquiring endpoint for domestic card processing."},
+{id:"GP UK/HSBC",x:900,y:278,w:82,h:22,t:1,ext:1,lbl:"GP UK/HSBC\nGP",d:"Global Payments UK / HSBC — acquiring arrangement where GP processes on behalf of HSBC merchant services."},
+{id:"UK/HSBC failover",x:900,y:302,w:95,h:22,t:1,ext:1,lbl:"UK/HSBC\nfailover",d:"UK/HSBC failover — backup acquiring path providing resilience for the HSBC processing arrangement."},
+{id:"Redsys (ext)",x:880,y:300,w:52,h:22,t:1,ext:1,lbl:"Redsys",d:"Redsys — Spain's national card scheme and interbank processing network."},
+{id:"GPNA",x:880,y:348,w:52,h:22,t:1,ext:1,d:"Global Payments North America — core NA market processor handling US and Canadian transactions."},
+{id:"Cybersource (UATP)",x:880,y:400,w:82,h:22,t:1,ext:1,lbl:"Cybersource",d:"Visa Cybersource — reached via UATP gateway for airline payment processing and settlement."},
+{id:"AIB (APACS)",x:880,y:450,w:48,h:22,t:1,ext:1,lbl:"AIB",d:"Allied Irish Banks — reached via dedicated AIB APACS gateway for APACS-format transactions."},
+
+// ─── SETTLEMENT PATH ───
+{id:"Settlement",x:620,y:445,w:75,h:38,t:1,ico:"📄",d:"Settlement engine — groups approved authorisations into settlement batches based on cut-off windows and merchant configurations. Prepares batch data for handoff to Batch ID Service for unique identification and file generation."},
+{id:"Batch ID Service",x:620,y:508,w:95,h:36,t:1,lbl:"Batch Id\nService",d:"Generates and manages unique batch identifiers for settlement file processing. Each settlement batch receives a unique ID tracked through the entire lifecycle — from batch creation to bank file submission to reconciliation."},
+
+// ─── FRAUD PATH ───
+{id:"Fraud Engine",x:480,y:480,w:90,h:38,t:2,d:"Real-time fraud detection engine — runs configurable rule sets and ML-based risk scoring models against each transaction. Reads historical transaction patterns from payandshop DB and writes fraud scores back. Flags high-risk transactions for additional external scoring via Fraud GW."},
+{id:"Fraud GW",x:740,y:540,w:75,h:32,t:2,d:"Dedicated fraud gateway — sends flagged high-risk transactions to external fraud scoring and decision management services (primarily Cybersource Decision Manager) for secondary risk assessment."},
+{id:"Cybersource (fraud)",x:880,y:540,w:82,h:24,t:1,ext:1,lbl:"Cybersource",d:"Visa Cybersource Decision Manager — external fraud scoring and risk management service. Receives flagged transactions from Fraud GW for secondary AI-based risk analysis."},
+
+// ─── CENTRAL DB: payandshop ───
+{id:"payandshop",x:400,y:410,w:105,h:52,t:1,db:1,d:"Central transaction database — the master transactional data store for the entire GP ECom platform. Records every transaction from authorisation through settlement. Read/written by: IPS (real-time writes), Fraud Engine (pattern reads/score writes), WhiteE (merchant portal reads), TMT (AML monitoring reads), MCS (currency data reads)."},
+
+// ─── ADMIN / MONITORING ───
+{id:"MCS",x:295,y:460,w:58,h:32,t:1,d:"Multi-Currency Service — handles foreign exchange conversion for settlement of cross-border transactions. Reads currency-related transaction data from payandshop and applies conversion rates for settlement in the merchant's base currency."},
+{id:"WhiteE",x:300,y:530,w:62,h:32,t:2,ico:"👤",d:"White-emanager (WhiteE) — white-labelled merchant management portal for partners, ISOs, and resellers. Provides transaction search, reporting, merchant onboarding, and configuration management. Reads transaction data from payandshop."},
+{id:"TMT",x:480,y:555,w:55,h:32,t:3,ico:"👤",d:"Transaction Monitoring Tool — AML compliance monitoring system. Continuously analyses transaction patterns from payandshop to detect suspicious activity, structuring, velocity anomalies, and other financial crime indicators. Operated by compliance teams."},
+
+// ─── BOTTOM STANDALONE ROW ───
+{id:"CMS",x:60,y:635,w:48,h:28,t:3,d:"Content Management System — manages HPP page templates, notification email templates, and merchant portal content. Allows customisation of the payment page look and feel."},
+{id:"AAU",x:128,y:635,w:48,h:28,t:3,d:"Authentication & Authorisation Utility — internal identity and access management service for platform users and operator accounts."},
+{id:"Card ID Service",x:196,y:635,w:95,h:28,t:1,lbl:"Card ID\nService",d:"Card Identification Service — performs real-time BIN (Bank Identification Number) lookups to identify card type (credit/debit), scheme (Visa/MC/Amex), issuing bank, country of issue, and card-level attributes. Used for intelligent routing, fee calculation, and regulatory compliance."},
+{id:"Open Banking",x:310,y:635,w:90,h:28,t:1,lbl:"Open\nBanking",d:"Open Banking service — enables account-to-account (A2A) bank payments via PSD2 Open Banking APIs. Bypasses card networks entirely for direct bank transfers, reducing interchange costs for merchants."},
+{id:"WDS",x:420,y:635,w:48,h:28,t:2,d:"Web-based Data Service — supports transaction processing workflows, web-based data integrations, and internal operational tooling."},
+{id:"MAAS",x:488,y:635,w:55,h:28,t:3,d:"Metal/Monitoring as a Service — infrastructure provisioning, bare-metal server management, and platform monitoring tooling for the operations team."},
+{id:"OTP",x:563,y:635,w:48,h:28,t:2,d:"One-Time Password service — generates and validates time-based and event-based OTPs for cardholder authentication, 3DS challenge flows, and transaction verification steps."},
+{id:"Batches",x:631,y:635,w:60,h:28,t:2,d:"Batch processing service — manages scheduled batch file infrastructure, SFTP file transfers to/from acquiring banks, and reconciliation file processing."},
 ];
 
-const svcMap = {};
-LAYERS.forEach(l => l.svcs.forEach(s => { s.layer = l.id; s.layerName = l.name; svcMap[s.n] = s; }));
+/* ══════════════════════════════════════════════════════════
+   EDGES — strictly traced from the diagram
+   ══════════════════════════════════════════════════════════ */
+const E=[
+// Merchant entry
+["Merchant System","Transaction Router"],
+["Merchant System (HPP)","HPP"],
+["HPP","Transaction Router"],
+["Merchant","RC2.1"],
+["RC2.1","rxp-api"],
+["rxp-api","Transaction Router"],
 
-let activeFilters = new Set();
-let selectedSvc = null;
+// TR dispatches
+["Transaction Router","APM"],
+["Transaction Router","DCC"],
+["Transaction Router","3DS Server"],
+["Transaction Router","CSS"],
+["Transaction Router","IPS"],
 
-function toggleFilter(tier) {
-  const btn = document.querySelector(`.filter-btn[data-tier="${tier}"]`);
-  if (activeFilters.has(tier)) { activeFilters.delete(tier); btn.classList.remove('active'); }
-  else { activeFilters.add(tier); btn.classList.add('active'); }
-  applyFilters();
-}
+// 3DS feeds IPS
+["3DS Server","IPS"],
+// CSS feeds IPS
+["CSS","IPS"],
 
-function applyFilters() {
-  const q = document.getElementById('search').value.toLowerCase();
-  document.querySelectorAll('.sidebar-item').forEach(el => {
-    const name = el.dataset.name;
-    const svc = svcMap[name];
-    if (!svc) return;
-    const matchTier = activeFilters.size === 0 || activeFilters.has(svc.t);
-    const matchSearch = !q || name.toLowerCase().includes(q) || svc.desc.toLowerCase().includes(q);
-    el.classList.toggle('hidden', !(matchTier && matchSearch));
-  });
-  document.querySelectorAll('.sidebar-section').forEach(sec => {
-    const visible = sec.querySelectorAll('.sidebar-item:not(.hidden)').length;
-    const countEl = sec.querySelector('.count');
-    if (countEl) countEl.textContent = visible;
-  });
-}
+// IPS outbound
+["IPS","Crypto"],
+["IPS","Bank Service"],
+["IPS","payandshop"],
+["IPS","Fraud Engine"],
+["IPS","Settlement"],
 
-document.getElementById('search').addEventListener('input', applyFilters);
+// Crypto ↔ Bank DBs
+["Crypto","Bank DBs"],
 
-function buildSidebar() {
-  const sb = document.getElementById('sidebar');
-  LAYERS.forEach(l => {
-    const sec = document.createElement('div');
-    sec.className = 'sidebar-section';
-    sec.innerHTML = `<div class="sidebar-section-header" onclick="this.nextElementSibling.classList.toggle('hidden');this.querySelector('.chevron').classList.toggle('collapsed')">
-      ${l.name}<span><span class="count">${l.svcs.length}</span> <span class="chevron">▾</span></span>
-    </div><div class="sidebar-list">${l.svcs.map(s => {
-      const ti = TIERS[s.t];
-      const totalConns = (s.out?.length||0) + (s.in?.length||0);
-      return `<div class="sidebar-item" data-name="${s.n}" onclick="selectService('${s.n.replace(/'/g,"\\'")}')">
-        <span class="dot" style="background:${ti.color}"></span>
-        <span class="name">${s.n}</span>
-        <span class="tier-badge" style="background:${ti.bg};color:${ti.color}">T${s.t}</span>
-        ${totalConns ? `<span class="conn-count">${totalConns}</span>` : ''}
-      </div>`;
-    }).join('')}</div>`;
-    sb.appendChild(sec);
-  });
-}
+// Bank Service → Gateways
+["Bank Service","ISO GW"],
+["Bank Service","APACS XOT GW"],
+["Bank Service","Redsys"],
+["Bank Service","GPC"],
+["Bank Service","UATP"],
+["Bank Service","AIB APACS"],
 
-function selectService(name) {
-  const svc = svcMap[name];
-  if (!svc) return;
-  selectedSvc = name;
-  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.toggle('active', el.dataset.name === name));
-  const main = document.getElementById('main');
-  const ti = TIERS[svc.t];
-  const ri = RISK[svc.r];
+// ISO GW → Acquirers
+["ISO GW","Elavon"],["ISO GW","Santander"],["ISO GW","AIB (ISO)"],["ISO GW","Worldpay"],
+["ISO GW","Barclays"],["ISO GW","Lloyds"],["ISO GW","GP UK/HSBC"],["ISO GW","UK/HSBC failover"],
 
-  const allOut = (svc.out || []).filter(n => n !== 'Gateways' && n !== 'All Gateways');
-  const isGwRef = (svc.out || []).some(n => n === 'Gateways' || n === 'All Gateways');
-  const allIn = (svc.in || []);
-  const reverseIn = [];
-  Object.values(svcMap).forEach(s => {
-    if (s.n !== name && s.out && s.out.includes(name) && !allIn.includes(s.n)) reverseIn.push(s.n);
-  });
-  const combinedIn = [...new Set([...allIn, ...reverseIn])];
+// APACS → UK banks
+["APACS XOT GW","AIB (ISO)"],["APACS XOT GW","Worldpay"],["APACS XOT GW","Barclays"],
+["APACS XOT GW","Lloyds"],["APACS XOT GW","GP UK/HSBC"],["APACS XOT GW","UK/HSBC failover"],
 
-  let gwHtml = '';
-  if (isGwRef) {
-    const gwLayer = LAYERS.find(l => l.id === 'gw');
-    const gws = gwLayer.svcs.filter(g => g.n !== 'Stunnel' && g.n !== 'SSO - Desjardins' && g.n !== 'Fexco gateway mock' && g.n !== 'Hosted Redirect Router');
-    gwHtml = `<div class="conn-group-title">Routes to gateways (${gws.length})</div>
-      <div class="conn-chips">${gws.map(g => chipHtml(g.n)).join('')}</div>`;
-  }
+// Other GWs
+["Redsys","Redsys (ext)"],
+["GPC","GPNA"],
+["UATP","Cybersource (UATP)"],
+["AIB APACS","AIB (APACS)"],
 
-  main.innerHTML = `
-    <div class="detail-card">
-      <div class="detail-header">
-        <div>
-          <div class="detail-title">${svc.n}</div>
-          <div class="detail-badges">
-            <span class="badge-pill" style="background:${ti.bg};color:${ti.color}">${ti.label}</span>
-            <span class="badge-pill" style="background:rgba(248,113,113,.1);color:${ri}">Risk ${svc.r}</span>
-            <span class="badge-pill" style="background:rgba(96,165,250,.1);color:#60a5fa">Canary ${svc.c}</span>
-            <span class="badge-pill" style="background:var(--surface2);color:var(--text2)">${svc.layerName}</span>
-          </div>
-        </div>
-      </div>
-      <div class="detail-desc">${svc.desc}</div>
-      <div class="connections-grid">
-        ${allOut.length ? `<div class="conn-group-title">Sends to / depends on (${allOut.length})</div><div class="conn-chips">${allOut.map(n => chipHtml(n)).join('')}</div>` : ''}
-        ${gwHtml}
-        ${combinedIn.length ? `<div class="conn-group-title">Receives from / called by (${combinedIn.length})</div><div class="conn-chips">${combinedIn.map(n => chipHtml(n)).join('')}</div>` : ''}
-        ${!allOut.length && !combinedIn.length && !isGwRef ? '<div style="color:var(--text3);font-size:13px">Standalone service — no mapped upstream/downstream connections</div>' : ''}
-      </div>
-    </div>
-    ${buildFlowCards(name)}
-  `;
-}
+// DCC path
+["DCC","Planet GW"],["DCC","Fexco GW"],
+["Planet GW","Planet (ext)"],["Fexco GW","Fexco (ext)"],
 
-function chipHtml(name) {
-  const s = svcMap[name];
-  const color = s ? TIERS[s.t].color : '#6b7280';
-  return `<span class="conn-chip" onclick="selectService('${name.replace(/'/g,"\\'")}')" title="${s?.desc||''}"><span class="chip-dot" style="background:${color}"></span>${name}</span>`;
-}
+// APM path
+["APM","PPRo"],
 
-const FLOWS = [
-  { title: "Real-time transaction flow", steps: ["Payments API","IPS","3DS2","Transaction Router","Gateway*","Authorization Service","Messenger Service"], icon: "⚡" },
-  { title: "Settlement flow", steps: ["Bulkfiles Core","Batch ID Service","MCS","Bank Service","Batching & File Processing"], icon: "🏦" },
-  { title: "Fraud & risk pipeline", steps: ["IPS","Fraud Engine","Card ID Service","PRM-service","TSS"], icon: "🛡" },
-  { title: "Reporting pipeline", steps: ["MRDI","TSS","Billing Service","Merchant Reporting","RealControl Reporting"], icon: "📊" },
+// Fraud path
+["Fraud Engine","payandshop"],
+["Fraud Engine","Fraud GW"],
+["Fraud GW","Cybersource (fraud)"],
+
+// Settlement
+["Settlement","Batch ID Service"],
+
+// Admin → payandshop
+["WhiteE","payandshop"],
+["MCS","payandshop"],
+["TMT","payandshop"],
 ];
 
-function buildFlowCards(activeName) {
-  return FLOWS.filter(f => f.steps.includes(activeName) || f.steps.some(s => s.replace('*','') === activeName)).map(f =>
-    `<div class="flow-card"><h3>${f.icon} ${f.title}</h3><div class="flow-steps">${f.steps.map((s,i) => {
-      const clean = s.replace('*','');
-      const svc = svcMap[clean];
-      const color = svc ? TIERS[svc.t].color : '#6b7280';
-      const bg = svc ? TIERS[svc.t].bg : 'rgba(107,114,128,.1)';
-      const bold = clean === activeName;
-      return `${i?'<span class="flow-arrow">→</span>':''}
-        <span class="flow-step" style="background:${bg};color:${color};${bold?'outline:1.5px solid '+color+';font-weight:600':''}" onclick="selectService('${clean.replace(/'/g,"\\'")}')">${s}</span>`;
-    }).join('')}</div></div>`
-  ).join('');
+/* ══════════════════════════════════════════════════════════
+   ZONES (dashed boundary boxes)
+   ══════════════════════════════════════════════════════════ */
+const Z=[
+  {x:10,y:275,w:130,h:295,c:var_bd(),l:"Merchants",lx:15,ly:272},
+  {x:145,y:40,w:230,h:310,c:var_bd(),l:"Transaction routing & value-added",lx:150,ly:37},
+  {x:390,y:100,w:185,h:280,c:var_bd(),l:"IPS core",lx:395,ly:97},
+  {x:575,y:85,w:105,h:165,c:var_bd(),l:"Crypto",lx:580,ly:82},
+  {x:585,y:340,w:150,h:230,c:var_bd(),l:"Dispatch & settlement",lx:590,ly:337},
+  {x:725,y:52,w:130,h:450,c:var_bd(),l:"Gateways",lx:730,ly:49},
+  {x:870,y:52,w:145,h:430,c:var_bd(),l:"Acquirers & processors",lx:875,ly:49},
+  {x:380,y:390,w:215,h:215,c:"rgba(251,191,36,.12)",l:"payandshop ecosystem",lx:385,ly:387},
+  {x:45,y:620,w:665,h:55,c:var_bd(),l:"Standalone services",lx:50,ly:617},
+];
+function var_bd(){return"var(--bd)"}
+
+/* ══════════════════════════════════════════════════════════
+   RENDER ENGINE
+   ══════════════════════════════════════════════════════════ */
+const cvs=document.getElementById('C'),W_el=document.getElementById('W'),ttEl=document.getElementById('TT'),ibEl=document.getElementById('IB');
+let sc=1,px=0,py=0,drag=false,lx,ly,sel=null;
+const nMap={};N.forEach(n=>nMap[n.id]=n);
+const adj={};N.forEach(n=>adj[n.id]={o:new Set(),i:new Set()});
+E.forEach(([a,b])=>{if(adj[a])adj[a].o.add(b);if(adj[b])adj[b].i.add(a)});
+
+function render(){
+  const CW=1040,CH=690;
+  let h='';
+
+  // Zones
+  Z.forEach(z=>{
+    h+=`<div class="zone" style="left:${z.x}px;top:${z.y}px;width:${z.w}px;height:${z.h}px;border-color:${z.c}"></div>`;
+    h+=`<div class="zlbl" style="left:${z.lx}px;top:${z.ly}px">${z.l}</div>`;
+  });
+
+  // SVG
+  h+=`<svg class="el" id="SV" width="${CW}" height="${CH}" viewBox="0 0 ${CW} ${CH}">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+  <path d="M2 1.5L8 5L2 8.5" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs><g id="EG">`;
+  E.forEach(([a,b])=>{
+    const na=nMap[a],nb=nMap[b];if(!na||!nb)return;
+    const aw=na.w||70,ah_=na.h||32,bw=nb.w||70,bh=nb.h||32;
+    const acx=na.x+aw/2,acy=na.y+ah_/2,bcx=nb.x+bw/2,bcy=nb.y+bh/2;
+    let x1,y1,x2,y2;
+    const dx=bcx-acx,dy=bcy-acy;
+    if(Math.abs(dx)>Math.abs(dy)){
+      x1=dx>0?na.x+aw:na.x; x2=dx>0?nb.x:nb.x+bw; y1=acy; y2=bcy;
+    } else {
+      y1=dy>0?na.y+ah_:na.y; y2=dy>0?nb.y:nb.y+bh; x1=acx; x2=bcx;
+    }
+    h+=`<line data-f="${a}" data-t="${b}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--t3)" stroke-width=".7" opacity=".28" marker-end="url(#ah)"/>`;
+  });
+  h+=`</g></svg>`;
+
+  // Nodes
+  N.forEach(n=>{
+    const w=n.w||70,ht=n.h||32;
+    let cls='nd';
+    if(n.ext)cls+=' ext';else if(n.db)cls+=' db';else cls+=` t${n.t}`;
+    if(n.big)cls+=' big';
+    const lbl=(n.lbl||n.id).replace(/\n/g,'<br>');
+    const ico=n.ico?`<span class="ico">${n.ico}</span>`:'';
+    h+=`<div class="${cls}" data-id="${n.id}" style="left:${n.x}px;top:${n.y}px;width:${w}px;height:${ht}px" onmouseenter="hIn(this)" onmouseleave="hOut()" onclick="ck('${esc(n.id)}')">${ico}${lbl}</div>`;
+  });
+
+  cvs.innerHTML=h;
+  cvs.style.width=CW+'px';cvs.style.height=CH+'px';
+  fit();
+}
+function esc(s){return s.replace(/'/g,"\\'");}
+
+/* ── TOOLTIP ── */
+function hIn(el){
+  const id=el.dataset.id,n=nMap[id];if(!n)return;
+  const tc=n.t===1?'var(--purple)':n.t===2?'var(--green)':'var(--gray)';
+  const tb=n.t===1?'var(--purpleBg)':n.t===2?'var(--greenBg)':'var(--grayBg)';
+  const oo=[...(adj[id]?.o||[])],ii=[...(adj[id]?.i||[])];
+  let ch='';
+  if(oo.length)ch+=`<strong>→ Sends to:</strong> ${oo.join(', ')}<br>`;
+  if(ii.length)ch+=`<strong>← Receives from:</strong> ${ii.join(', ')}`;
+  ttEl.innerHTML=`<div class="tn">${n.id}</div>
+    <div class="tb">
+      <span class="tp" style="background:${tb};color:${tc}">Tier ${n.t}</span>
+      ${n.ext?'<span class="tp" style="background:var(--blueBg);color:var(--blue)">External endpoint</span>':''}
+      ${n.db?'<span class="tp" style="background:var(--amberBg);color:var(--amber)">Database</span>':''}
+    </div>
+    <div class="td">${n.d}</div>
+    ${ch?`<div class="tc">${ch}</div>`:''}`;
+  ttEl.classList.add('show');
+  document.addEventListener('mousemove',mvTT);
+  ibEl.innerHTML=`<span class="nm">${n.id}</span><span class="ds">${n.d}</span><span class="pl" style="background:${tb};color:${tc}">T${n.t}</span>`;
+  if(!sel)hl(id,true);
+}
+function mvTT(e){let x=e.clientX+14,y=e.clientY+10;if(x+350>innerWidth)x=e.clientX-350;if(y+200>innerHeight)y=e.clientY-210;ttEl.style.left=x+'px';ttEl.style.top=y+'px';}
+function hOut(){ttEl.classList.remove('show');document.removeEventListener('mousemove',mvTT);if(!sel)clrHL();}
+
+/* ── CLICK ── */
+function ck(id){if(sel===id){clr();return;}sel=id;hl(id,false);}
+function clr(){sel=null;clrHL();ibEl.innerHTML='<span class="ht">Hover a service for details · Click to lock highlight · Esc to reset · Scroll to zoom · Drag to pan</span>';}
+
+/* ── HIGHLIGHT ── */
+function hl(id,soft){
+  const conn=new Set([id]);
+  (adj[id]?.o||new Set()).forEach(n=>conn.add(n));
+  (adj[id]?.i||new Set()).forEach(n=>conn.add(n));
+  document.querySelectorAll('.nd').forEach(el=>{
+    const nid=el.dataset.id;
+    el.classList.toggle('hl',conn.has(nid));
+    el.style.opacity=conn.has(nid)?'1':soft?'.3':'.12';
+  });
+  document.querySelectorAll('#EG line').forEach(ln=>{
+    const f=ln.dataset.f,t=ln.dataset.t,c=(f===id||t===id);
+    if(c){
+      const isOut=f===id;
+      ln.setAttribute('stroke',isOut?'var(--purple)':'var(--green)');
+      ln.setAttribute('stroke-width','2');
+      ln.setAttribute('opacity','.9');
+    } else {
+      ln.setAttribute('stroke','var(--t3)');
+      ln.setAttribute('stroke-width','.4');
+      ln.setAttribute('opacity',soft?'.08':'.04');
+    }
+  });
+}
+function clrHL(){
+  document.querySelectorAll('.nd').forEach(el=>{el.classList.remove('hl');el.style.opacity='';});
+  document.querySelectorAll('#EG line').forEach(ln=>{ln.setAttribute('stroke','var(--t3)');ln.setAttribute('stroke-width','.7');ln.setAttribute('opacity','.28');});
 }
 
-function showWelcome() {
-  const t1 = LAYERS.reduce((a,l) => a + l.svcs.filter(s=>s.t===1).length, 0);
-  const t2 = LAYERS.reduce((a,l) => a + l.svcs.filter(s=>s.t===2).length, 0);
-  const t3 = LAYERS.reduce((a,l) => a + l.svcs.filter(s=>s.t===3).length, 0);
-  const total = t1+t2+t3;
-  document.getElementById('main').innerHTML = `
-    <div class="stats-bar">
-      <div class="stat" style="color:var(--t1)"><small>Tier 1</small>${t1}</div>
-      <div class="stat" style="color:var(--t2)"><small>Tier 2</small>${t2}</div>
-      <div class="stat" style="color:var(--t3)"><small>Tier 3</small>${t3}</div>
-      <div class="stat"><small>Total</small>${total}</div>
-      <div class="stat"><small>Layers</small>${LAYERS.length}</div>
-    </div>
-    ${FLOWS.map(f => `<div class="flow-card"><h3>${f.icon} ${f.title}</h3><div class="flow-steps">${f.steps.map((s,i) => {
-      const clean = s.replace('*','');
-      const svc = svcMap[clean];
-      const color = svc ? TIERS[svc.t].color : '#6b7280';
-      const bg = svc ? TIERS[svc.t].bg : 'rgba(107,114,128,.1)';
-      return `${i?'<span class="flow-arrow">→</span>':''}
-        <span class="flow-step" style="background:${bg};color:${color}" onclick="selectService('${clean.replace(/'/g,"\\'")}')">${s}</span>`;
-    }).join('')}</div></div>`).join('')}
-    <div class="welcome-state">
-      <div class="big-icon">◎</div>
-      <h2>Select a service to explore</h2>
-      <p>Click any service in the sidebar to see its description, tier, risk level, and all upstream/downstream connections. Use the search bar or tier filters to narrow down.</p>
-    </div>
-  `;
+/* ── PAN & ZOOM ── */
+function apply(){cvs.style.transform=`translate(${px}px,${py}px) scale(${sc})`;}
+function zm(f){sc=Math.max(.25,Math.min(3.5,sc*f));apply();}
+function fit(){
+  const ww=W_el.clientWidth,wh=W_el.clientHeight;
+  sc=Math.min(ww/1040,wh/690)*.93;
+  px=(ww-1040*sc)/2;py=(wh-690*sc)/2;apply();
 }
+W_el.onmousedown=e=>{if(e.target.closest('.nd'))return;drag=true;lx=e.clientX;ly=e.clientY;};
+onmousemove=e=>{if(!drag)return;px+=e.clientX-lx;py+=e.clientY-ly;lx=e.clientX;ly=e.clientY;apply();};
+onmouseup=()=>drag=false;
+W_el.addEventListener('wheel',e=>{e.preventDefault();const r=W_el.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,ps=sc;sc*=e.deltaY<0?1.1:1/1.1;sc=Math.max(.25,Math.min(3.5,sc));px=mx-(mx-px)*sc/ps;py=my-(my-py)*sc/ps;apply();},{passive:false});
 
-buildSidebar();
-showWelcome();
-initGate();
+// Touch
+let ld=0,ltx,lty;
+W_el.ontouchstart=e=>{if(e.touches.length===1){drag=true;ltx=e.touches[0].clientX;lty=e.touches[0].clientY;}if(e.touches.length===2)ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);};
+W_el.ontouchmove=e=>{if(e.touches.length===1&&drag){px+=e.touches[0].clientX-ltx;py+=e.touches[0].clientY-lty;ltx=e.touches[0].clientX;lty=e.touches[0].clientY;apply();}if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(ld){sc*=d/ld;sc=Math.max(.25,Math.min(3.5,sc));apply();}ld=d;}};
+W_el.ontouchend=()=>{drag=false;ld=0;};
+
+onkeydown=e=>{if(e.key==='Escape')clr();if(e.key==='+'||e.key==='=')zm(1.2);if(e.key==='-')zm(1/1.2);if(e.key==='0')fit();};
+onresize=fit;
+
+render();
 </script>
 </body>
 </html>
